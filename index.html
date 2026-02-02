@@ -1,102 +1,85 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Windows Update</title>
     <style>
         body {
-            background-color: #0078d7; /* Windowsの更新画面に近い青 */
+            background-color: #000; /* 最初は真っ黒 */
             color: white;
-            font-family: "Segoe UI", Segoe, Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "Segoe UI", sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            cursor: none; /* マウスカーソルを消す */
-            user-select: none;
+            cursor: pointer;
             overflow: hidden;
+            user-select: none;
         }
+
+        #update-screen { display: none; text-align: center; cursor: none; }
 
         .loader {
-            border: 3px solid #ffffff;
+            width: 50px; height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-left-color: #fff;
             border-radius: 50%;
-            border-top: 3px solid transparent;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            margin: 0 auto 35px;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        h1 {
-            font-weight: 300;
-            font-size: 2.5vw;
-            margin: 0;
-        }
-
-        p {
-            font-size: 1.2vw;
-            margin-top: 10px;
-        }
-
-        .troll-note {
-            position: fixed;
-            bottom: 5px;
-            right: 5px;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.1);
-        }
+        h1 { font-weight: 400; font-size: 2.2vw; margin: 0; }
+        p { font-weight: 300; font-size: 1.1vw; margin-top: 15px; }
+        .troll { position: fixed; bottom: 5px; right: 5px; font-size: 8px; color: rgba(255,255,255,0.05); }
     </style>
 </head>
-<body>
+<body onclick="startPrank()">
 
-    <div id="main-content">
+    <!-- クリック前：カモフラージュ -->
+    <div id="init-msg" style="color: #333; font-size: 14px;">Loading content...</div>
+
+    <!-- クリック後：本番画面 -->
+    <div id="update-screen">
         <div class="loader"></div>
-        <h1>更新プログラムを構成しています</h1>
-        <p><span id="percent">0</span>% 完了</p>
-        <p>コンピューターの電源を切らないでください。これにはしばらく時間がかかります。</p>
+        <h1>Working on updates</h1>
+        <p><span id="percent">0</span>% complete</p>
+        <p>Please keep your computer on.</p>
     </div>
 
-    <div class="troll-note">THIS IS A TROLL (Press Esc to exit)</div>
+    <div class="troll">THIS IS A TROLL</div>
 
     <script>
-        // どこかをクリックしたらフルスクリーンにする
-        document.body.addEventListener('click', function() {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            }
-        });
+        function startPrank() {
+            // フルスクリーン要求
+            const doc = document.documentElement;
+            if (doc.requestFullscreen) doc.requestFullscreen();
+            else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
 
-        // ％をゆっくり増やす（99％で止める）
+            // 画面切り替え
+            document.getElementById('init-msg').style.display = 'none';
+            document.getElementById('update-screen').style.display = 'block';
+            document.body.style.backgroundColor = '#0078d7';
+            document.body.style.cursor = 'none';
+
+            updatePercent();
+        }
+
         let percent = 0;
-        const percentElement = document.getElementById('percent');
-
         function updatePercent() {
             if (percent < 99) {
-                // 基本はゆっくり、時々止まるリアルな動き
-                let increment = Math.random() > 0.8 ? 1 : 0;
-                percent += increment;
-                percentElement.innerText = percent;
-                
-                // 次の更新までの時間を不規則にする
-                let nextUpdate = Math.random() * 5000 + 1000;
-                setTimeout(updatePercent, nextUpdate);
+                if (Math.random() > 0.8) {
+                    percent += 1;
+                    document.getElementById('percent').innerText = percent;
+                }
+                setTimeout(updatePercent, Math.random() * 3000 + 500);
             }
         }
 
-        updatePercent();
-
-        // EscキーやF11以外で閉じにくくするトラップ（気休め）
-        window.onbeforeunload = function() {
-            return "更新を中断するとシステムが破損する恐れがあります。";
-        };
+        // 閉じようとすると警告を出す
+        window.onbeforeunload = function() { return "Updating..."; };
     </script>
 </body>
 </html>
