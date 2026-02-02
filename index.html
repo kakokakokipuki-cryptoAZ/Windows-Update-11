@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Windows Update</title>
+    <style>
+        body {
+            background-color: #0078d7; /* Windowsの更新画面に近い青 */
+            color: white;
+            font-family: "Segoe UI", Segoe, Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            cursor: none; /* マウスカーソルを消す */
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .loader {
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top: 3px solid transparent;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-weight: 300;
+            font-size: 2.5vw;
+            margin: 0;
+        }
+
+        p {
+            font-size: 1.2vw;
+            margin-top: 10px;
+        }
+
+        .troll-note {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-content">
+        <div class="loader"></div>
+        <h1>更新プログラムを構成しています</h1>
+        <p><span id="percent">0</span>% 完了</p>
+        <p>コンピューターの電源を切らないでください。これにはしばらく時間がかかります。</p>
+    </div>
+
+    <div class="troll-note">THIS IS A TROLL (Press Esc to exit)</div>
+
+    <script>
+        // どこかをクリックしたらフルスクリーンにする
+        document.body.addEventListener('click', function() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        });
+
+        // ％をゆっくり増やす（99％で止める）
+        let percent = 0;
+        const percentElement = document.getElementById('percent');
+
+        function updatePercent() {
+            if (percent < 99) {
+                // 基本はゆっくり、時々止まるリアルな動き
+                let increment = Math.random() > 0.8 ? 1 : 0;
+                percent += increment;
+                percentElement.innerText = percent;
+                
+                // 次の更新までの時間を不規則にする
+                let nextUpdate = Math.random() * 5000 + 1000;
+                setTimeout(updatePercent, nextUpdate);
+            }
+        }
+
+        updatePercent();
+
+        // EscキーやF11以外で閉じにくくするトラップ（気休め）
+        window.onbeforeunload = function() {
+            return "更新を中断するとシステムが破損する恐れがあります。";
+        };
+    </script>
+</body>
+</html>
